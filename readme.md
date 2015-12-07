@@ -12,8 +12,8 @@ Example: `~/.config/configstore/some-id.json`
 const Configstore = require('configstore');
 const pkg = require('./package.json');
 
-// Init a Configstore instance with an unique ID e.g.
-// package name and optionally some default values
+// Init a Configstore instance with an unique ID (e.g. package name) and
+// optionally some default values
 const conf = new Configstore(pkg.name, {foo: 'bar'});
 
 conf.set('awesome', true);
@@ -68,7 +68,16 @@ Store the config at `$CONFIG/package-name/config.json` instead of the default
 end up conflicting with other tools, rendering the "without having to think"
 idea moot.
 
-##### path
+##### onError
+
+Type: `function`
+Default: The default handler throws on error
+
+When a read/write error occurs we pass it to the onError handler. The handler's
+signature is `(err, conf)`, where err is an `Error` and conf is the
+current config instance. Use a custom onError handler if you don't want to throw
+on errors (e.g. you are working with non-essential data) or if you want to
+implement some custom handling (e.g. send errors to server).
 
 ### config.set(key, value)
 
