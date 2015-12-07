@@ -7,8 +7,16 @@ var pathExists = require('path-exists');
 var Configstore = require('./');
 var configstorePath = new Configstore('configstore-test').path;
 
+function deleteFile(path) {
+	try {
+		fs.unlinkSync(path);
+	} catch (e) {
+		// Don't care
+	}
+}
+
 beforeEach(function () {
-	fs.unlinkSync(configstorePath);
+	deleteFile(configstorePath);
 	this.conf = new Configstore('configstore-test');
 });
 
@@ -58,21 +66,14 @@ it('support global namespace path option', function () {
 
 it('support custom path', function () {
 	var configPath = path.join(__dirname, 'configstore-custom.json');
-	var deleteConfig = function () {
-		try {
-			fs.unlinkSync(configPath);
-		} catch (e) {
-			// Don't care
-		}
-	};
 
 	// Remove possible residues from previous runs
-	deleteConfig();
+	deleteFile(configPath);
 
 	var conf = new Configstore(configPath);
 	conf.set('foo', 'bar');
 	var exists = pathExists.sync(configPath);
-	deleteConfig();
+	deleteFile(configPath);
 	assert(exists);
 });
 
@@ -81,4 +82,37 @@ it('make sure `.all` is always an object', function () {
 	assert.doesNotThrow(function () {
 		this.conf.get('foo');
 	}.bind(this));
+});
+
+it('should throw when using default onError handler', function () {
+	var conf = new Configstore('configstore-test');
+
+	// An object with a reference to self (circular), should cause an error during
+	// serialization (JSON.stringify)
+	var obj = {a: 1, b: 2};
+	obj.selfRef = obj;
+
+	assert.throws(function () {
+		conf.set('foo', obj);
+	});
+});
+
+it('should not throw when using a custom onError handler', function () {
+	var conf = new Configstore('configstore-test', null, {
+		onError: function (err, confInstance) {
+			assert(typeof err.message === 'string', 'err.message is a string');
+			assert(Object.prototype.toString.call(err) === '[object Error]',
+				'err is of type Error');
+			assert(conf === confInstance, 'conf === confInstance');
+		}
+	});
+
+	// An object with a reference to self (circular), should cause an error during
+	// serialization (JSON.stringify)
+	var obj = {a: 1, b: 2};
+	obj.selfRef = obj;
+
+	assert.doesNotThrow(function () {
+		conf.set('foo', obj);
+	});
 });

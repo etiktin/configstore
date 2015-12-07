@@ -15,6 +15,10 @@ var permissionError = 'You don\'t have access to this file.';
 var defaultPathMode = parseInt('0700', 8);
 var writeFileOptions = {mode: parseInt('0600', 8)};
 
+function throwError(err) {
+	throw err;
+}
+
 function Configstore(id, defaults, opts) {
 	opts = opts || {};
 
@@ -25,6 +29,8 @@ function Configstore(id, defaults, opts) {
 	// if id is an absolute path we treat id as the full config path,
 	// otherwise we save config to the default location
 	this.path = path.dirname(id) === '.' ? path.join(configDir, pathPrefix) : id;
+
+	this.onError = opts.onError || throwError;
 
 	this.all = assign({}, defaults || {}, this.all || {});
 }
@@ -52,7 +58,8 @@ Configstore.prototype = Object.create(Object.prototype, {
 					return {};
 				}
 
-				throw err;
+				this.onError(err, this);
+				return {};
 			}
 		},
 		set: function (val) {
@@ -68,7 +75,7 @@ Configstore.prototype = Object.create(Object.prototype, {
 					err.message = err.message + '\n' + permissionError + '\n';
 				}
 
-				throw err;
+				this.onError(err, this);
 			}
 		}
 	},
