@@ -2,6 +2,7 @@
 'use strict';
 var assert = require('assert');
 var fs = require('fs');
+var path = require('path');
 var pathExists = require('path-exists');
 var Configstore = require('./');
 var configstorePath = new Configstore('configstore-test').path;
@@ -53,6 +54,26 @@ it('support global namespace path option', function () {
 	var conf = new Configstore('configstore-test', {}, {globalConfigPath: true});
 	var regex = /configstore-test(\/|\\)config.json$/;
 	assert(regex.test(conf.path));
+});
+
+it('support custom path', function () {
+	var configPath = path.join(__dirname, 'configstore-custom.json');
+	var deleteConfig = function () {
+		try {
+			fs.unlinkSync(configPath);
+		} catch (e) {
+			// Don't care
+		}
+	};
+
+	// Remove possible residues from previous runs
+	deleteConfig();
+
+	var conf = new Configstore(configPath);
+	conf.set('foo', 'bar');
+	var exists = pathExists.sync(configPath);
+	deleteConfig();
+	assert(exists);
 });
 
 it('make sure `.all` is always an object', function () {

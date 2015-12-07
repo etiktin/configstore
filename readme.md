@@ -33,15 +33,20 @@ console.log(conf.get('awesome'));
 
 ## API
 
-### Configstore(packageName, [defaults], [options])
+### Configstore(idOrPath, [defaults], [options])
 
 Create a new Configstore instance `config`.
 
-#### packageName
+#### idOrPath
 
 Type: `string`
 
-Name of your package.
+Name of your package or some other unique ID. It can also be an absolute path to
+the config file (e.g. `/foo/bar/config.json` or `c:\foo\bar\config.json`).
+Passing a path is useful if your app has a designated place to store user data
+(e.g. if you are using [Electron](http://electron.atom.io/), you can store the
+config under the [`userData`](https://github.com/atom/electron/blob/master/docs/api/app.md#appgetpathname)
+directory).
 
 #### defaults
 
@@ -58,7 +63,12 @@ Type: `object`
 Type: `boolean`  
 Default: `false`
 
-Store the config at `$CONFIG/package-name/config.json` instead of the default `$CONFIG/configstore/package-name.json`. This is not recommended as you might end up conflicting with other tools, rendering the "without having to think" idea moot.
+Store the config at `$CONFIG/package-name/config.json` instead of the default
+`$CONFIG/configstore/package-name.json`. This is not recommended as you might
+end up conflicting with other tools, rendering the "without having to think"
+idea moot.
+
+##### path
 
 ### config.set(key, value)
 
@@ -92,8 +102,8 @@ Get the item count.
 
 ### config.path
 
-Get the path to the config file. Can be used to show the user where the config file is located or even better open it for them.
-
+Get the path to the config file. Can be used to show the user where the config
+file is located or even better open it for them.
 
 ## License
 
