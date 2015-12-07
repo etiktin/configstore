@@ -60,7 +60,8 @@ Type: `object`
 
 ##### globalConfigPath
 
-Type: `boolean`  
+Type: `boolean`
+
 Default: `false`
 
 Store the config at `$CONFIG/package-name/config.json` instead of the default
@@ -71,6 +72,7 @@ idea moot.
 ##### onError
 
 Type: `function`
+
 Default: The default handler throws on error
 
 When a read/write error occurs we pass it to the onError handler. The handler's
