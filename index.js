@@ -24,7 +24,7 @@ function Configstore(id, defaults, opts) {
 
 	// if id is an absolute path we treat id as the full config path,
 	// otherwise we save config to the default location
-	this.path = path.dirname(id) !== '.' ? id : path.join(configDir, pathPrefix);
+	this.path = path.dirname(id) === '.' ? path.join(configDir, pathPrefix) : id;
 
 	this.all = assign({}, defaults || {}, this.all || {});
 }
